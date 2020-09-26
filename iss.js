@@ -15,16 +15,34 @@ const fetchMyIP = function(callback) {
       callback(error, null);
       return;
     }
-
-    // if non-200 status, assume server error
+    
     if (response.statusCode !== 200) {
       const msg = `Status Code ${response.statusCode} when fetching IP. Response: ${body}`;
       callback(Error(msg), null);
-      return;
     } else {
       callback(null, body);
     }
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = function(ip, callback) {
+  request(`https://ipvigilante.com/${ip}`, (error, response, body) => {
+    if (error) {
+      callback(error, null);
+      return;
+    }
+
+    if (response.statusCode !== 200) {
+      const msg = `Status Code ${response.statusCode} when fetching coordinates. Response: ${body}`;
+      callback(Error(msg), null);
+    } else {
+      const bodyObj = JSON.parse(body).data;
+      const coordinates = {};
+      coordinates.latitude = bodyObj.data.latitude;
+      coordinates.longitude = bodyObj.data.longitude;
+      callback(error, coordinates);
+    }
+  });
+};
+
+module.exports = {fetchMyIP, fetchCoordsByIP};
